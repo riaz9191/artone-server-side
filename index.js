@@ -29,6 +29,7 @@ async function run() {
         await client.connect();
         const instructorCollection = client.db('artoneDb').collection('instructors');
         const classesCollection = client.db('artoneDb').collection('classes');
+        const cartCollection = client.db('artoneDb').collection('carts');
 
         //instructor 
         app.get('/instructors', async (req, res) => {
@@ -41,6 +42,30 @@ async function run() {
             const result = await classesCollection.find().toArray();
             res.send(result); 
         })
+
+
+        //cart collection
+        app.get('/carts', async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+              res.send([]);
+            }
+      
+            // const decodedEmail = req.decoded.email;
+            // if(email !== decodedEmail){
+            //   return res.status(403).send({error: true, message: 'forbidden acces'});
+            // }
+            const query = { email: email }
+            const result = await cartCollection.find(query).toArray();
+            res.send(result);
+          })
+
+        app.post('/carts' ,async(req,res)=>{
+            const item = req.body;
+            console.log(item)
+            const result = await cartCollection.insertOne(item);
+            res.send(result);
+        } )
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pingedd your deployment. You successfully connected to MongoDB!");
