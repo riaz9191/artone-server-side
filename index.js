@@ -35,8 +35,13 @@ async function run() {
 
         //user collection
 
-        app.post('/users',async(req,res)=>{
+        app.post('/users', async (req, res) => {
             const user = req.body;
+            console.log(user)
+            const existingUser = await userCollection.findOne(query);
+            if (existingUser) {
+                return res.send({ message: 'User already exists' })
+            }
             const result = await userCollection.insertOne(user)
             res.send(result)
         })
@@ -52,7 +57,7 @@ async function run() {
         //classes 
         app.get('/classes', async (req, res) => {
             const result = await classesCollection.find().toArray();
-            res.send(result); 
+            res.send(result);
         })
 
 
@@ -60,9 +65,9 @@ async function run() {
         app.get('/carts', async (req, res) => {
             const email = req.query.email;
             if (!email) {
-              res.send([]);
+                res.send([]);
             }
-      
+
             // const decodedEmail = req.decoded.email;
             // if(email !== decodedEmail){
             //   return res.status(403).send({error: true, message: 'forbidden acces'});
@@ -70,17 +75,17 @@ async function run() {
             const query = { email: email }
             const result = await cartCollection.find(query).toArray();
             res.send(result);
-          })
+        })
 
-        app.post('/carts' ,async(req,res)=>{
+        app.post('/carts', async (req, res) => {
             const item = req.body;
             console.log(item)
             const result = await cartCollection.insertOne(item);
             res.send(result);
-        } )
-        app.delete('/carts/:id', async (req, res)=>{
-            const id =req.params.id;
-            const query= {_id: new ObjectId(id)};
+        })
+        app.delete('/carts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
             const result = await cartCollection.deleteOne(query);
             res.send(result);
         })
